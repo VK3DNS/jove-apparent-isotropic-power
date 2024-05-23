@@ -18,5 +18,5 @@ class Calculator():
         Wpms : float = 1/rSph #watts per square meter
 
         iW : float = F/Wpms #isotropic joules
-        apparentIsotropicWattsOver2MHz = iW*2*10**6
+        apparentIsotropicWattsOver2MHz : float = iW*2*10**6
         return apparentIsotropicWattsOver2MHz
