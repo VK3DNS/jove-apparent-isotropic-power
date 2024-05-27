@@ -1,21 +1,15 @@
 class Calculator():
-    def __init__(self, Hz = 2.01 * 10 ** 7, mG = 9.3 * 10 ** 0, B = 6 * 10 ** 3, K = 9.1 * 10 ** 4, AuD = 4.2 * 10 ** 0, *args):
+    def __init__(self, Hz = None, mG =None, B = None, K = None, AuD = None, *args):
         from math import pi
         self.pi : float = pi
         self.C : float = 2.99792*10**8 #speed of light
         self.kB : float = 1.38065*10**-23 #boltzmann constant
 
-        self.Hz : float = Hz  # base freq. (Hz)
-        self.mG : float = mG # antenna maxgain (unit not specified, I assume dB)
-        self.B : float = B  # bandwidth (Hz)
-        self.K : float = K  # antenna temp. (K)
-        self.AuD : float = AuD  # distance to object (AU) ##Jupiter is about 4.2 AU
-
-        self.Hz : float = self.Hz if type(self.Hz) is int or float else 2.01 * 10 ** 7
-        self.mG : float = self.mG if type(self.Hz) is int or float else 9.3 * 10 ** 0
-        self.B : float = self.B if type(self.Hz) is int or float else 6 * 10 ** 3
-        self.K : float = self.K if type(self.Hz) is int or float else 9.1 * 10 ** 4
-        self.AuD : float = self.AuD if type(self.Hz) is int or float else 4.2 * 10 ** 0
+        self.Hz : float = Hz if str(Hz).isnumeric() else 2.01 * 10 ** 7
+        self.mG : float = mG if str(mG).isnumeric() else 9.3 * 10 ** 0
+        self.B : float = B if str(B).isnumeric() else 6 * 10 ** 3
+        self.K : float = K if str(K).isnumeric() else 9.1 * 10 ** 4
+        self.AuD : float = AuD if str(AuD).isnumeric() else 4.2 * 10 ** 0
 
         self.calculateisotropicpower()
 
@@ -96,6 +90,8 @@ class Calculator():
 def main():
     c = Calculator()
     print(c.isotropicpower)
+
+
 
 if __name__ == "__main__":
     main()
