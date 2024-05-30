@@ -1,5 +1,3 @@
-import sys
-from PySide6.QtWidgets import QApplication, QPushButton
 from PySide6.QtCore import QObject, Signal, Slot
 
 class Sender(QObject):
@@ -11,7 +9,7 @@ class Sender(QObject):
     receive_AuD = Signal(float)
 
 class Calculator(QObject):
-    def __init__(self, send, Hz = None, mG =None, B = None, K = None, AuD = None, *args):
+    def __init__(self, tx, Hz = None, mG =None, B = None, K = None, AuD = None, *args):
         from math import pi
         self.pi: float = pi
         self.C: float = 2.99792*10**8  # speed of light
@@ -27,62 +25,62 @@ class Calculator(QObject):
 
         self.calculateisotropicpower()
 
-        self.send = send
+        self.tx = tx
 
     @Slot()
     def values(self):
-        self.send.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD])
+        self.tx.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD])
 
     @Slot()
     def get_Hz(self):
-        self.send.receive_Hz.emit(self.Hz)
+        self.tx.receive_Hz.emit(self.Hz)
 
     @Slot()
     def get_mG(self):
-        self.send.receive_mG.emit(self.mG)
+        self.tx.receive_mG.emit(self.mG)
 
     @Slot()
     def get_B(self):
-        self.send.receive_B.emit(self.B)
+        self.tx.receive_B.emit(self.B)
 
     @Slot()
     def get_K(self):
-        self.send.receive_K.emit(self.K)
+        self.tx.receive_K.emit(self.K)
 
     @Slot()
     def get_AuD(self):
-        self.send.receive_AuD.emit(self.AuD)
+        self.tx.receive_AuD.emit(self.AuD)
 
     @Slot(float)
     def set_Hz(self, Hz):
         self.Hz = float(Hz)
         self.calculateisotropicpower()
-        self.send.receive_Hz.emit(self.Hz)
+        self.tx.receive_Hz.emit(self.Hz)
 
     @Slot(float)
     def set_mG(self, mG):
         self.mG = float(mG)
         self.calculateisotropicpower()
-        self.send.receive_mG.emit(self.mG)
+        self.tx.receive_mG.emit(self.mG)
 
     @Slot(float)
     def set_B(self, B):
         self.B = float(B)
         self.calculateisotropicpower()
-        self.send.receive_B.emit(self.B)
+        self.tx.receive_B.emit(self.B)
 
 
     @Slot(float)
     def set_K(self, K, *args):
         self.K = float(K)
         self.calculateisotropicpower()
-        self.send.receive_K.emit(self.K)
+        self.tx.receive_K.emit(self.K)
 
     @Slot(float)
     def set_AuD(self, AuD):
         self.AuD = float(AuD)
         self.calculateisotropicpower()
-        self.send.receive_AuD.emit(self.AuD)
+        self.tx.receive_AuD.emit(self.AuD)
 
     def calculateisotropicpower(self, *args):
         λ: float = self.C/self.Hz  # wavelength
