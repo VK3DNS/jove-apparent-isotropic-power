@@ -118,7 +118,6 @@ def main():
 
     communicate.set_K.emit(1)
     print(f'K is {values["K"]}')
-    communicate.get_values.emit()
     print(calc.isotropicpower)
 
     #print(f'apparent isotropic power transmitted over the 2MHz band is {calc.isotropicpower} Joules')
