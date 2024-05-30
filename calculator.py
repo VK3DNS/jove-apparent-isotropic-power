@@ -1,5 +1,6 @@
 from PySide6.QtCore import QObject, Signal, Slot
 
+
 class Sender(QObject):
     """
     class Sender:
@@ -19,6 +20,7 @@ class Sender(QObject):
     receive_B = Signal(float)
     receive_K = Signal(float)
     receive_AuD = Signal(float)
+
 
 class Calculator(QObject):
     """
@@ -274,6 +276,7 @@ class Calculator(QObject):
         self.isotropicpower : float = iW*2*10**6
         return self.isotropicpower
 
+
 def main():
     """
     main()
@@ -291,7 +294,6 @@ def main():
     print(main.__doc__)
     c = Calculator(Sender())
     print(c.isotropicpower)
-
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ values = {
     'AuD': False
 }
 
+
 class Communicate(QObject):
     set_Hz = Signal(int)
     set_mG = Signal(int)
@@ -139,6 +140,7 @@ class Receive:
         """
         values['AuD'] = AuD
 
+
 def run():
     """
     run()
@@ -189,6 +191,7 @@ def run():
 
     return communicate, values, rx, tx, calc
 
+
 def main():
     """
     main()
@@ -220,7 +223,7 @@ def main():
     print(f'K is {values["K"]}')
     print(calc.isotropicpower)
 
-    #print(f'apparent isotropic power transmitted over the 2MHz band is {calc.isotropicpower} Joules')
+    # print(f'apparent isotropic power transmitted over the 2MHz band is {calc.isotropicpower} Joules')
 
 
 if __name__ == '__main__':
