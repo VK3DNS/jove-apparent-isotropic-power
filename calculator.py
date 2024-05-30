@@ -1,89 +1,102 @@
-class Calculator():
-    def __init__(self, Hz = None, mG =None, B = None, K = None, AuD = None, *args):
-        from math import pi
-        self.pi : float = pi
-        self.C : float = 2.99792*10**8 #speed of light
-        self.kB : float = 1.38065*10**-23 #boltzmann constant
+import sys
+from PySide6.QtWidgets import QApplication, QPushButton
+from PySide6.QtCore import QObject, Signal, Slot
 
-        self.Hz : float = Hz if str(Hz).isnumeric() else 2.01 * 10 ** 7
-        self.mG : float = mG if str(mG).isnumeric() else 9.3 * 10 ** 0
-        self.B : float = B if str(B).isnumeric() else 6 * 10 ** 3
-        self.K : float = K if str(K).isnumeric() else 9.1 * 10 ** 4
-        self.AuD : float = AuD if str(AuD).isnumeric() else 4.2 * 10 ** 0
+class Sender(QObject):
+    receive_values = Signal(list)
+    receive_Hz = Signal(float)
+    receive_mG = Signal(float)
+    receive_B = Signal(float)
+    receive_K = Signal(float)
+    receive_AuD = Signal(float)
+
+class Calculator(QObject):
+    def __init__(self, send, Hz = None, mG =None, B = None, K = None, AuD = None, *args):
+        from math import pi
+        self.pi: float = pi
+        self.C: float = 2.99792*10**8  # speed of light
+        self.kB: float = 1.38065*10**-23  # boltzmann constant
+
+        self.Hz: float = Hz if str(Hz).isnumeric() else 2.01 * 10 ** 7
+        self.mG: float = mG if str(mG).isnumeric() else 9.3 * 10 ** 0
+        self.B: float = B if str(B).isnumeric() else 6 * 10 ** 3
+        self.K: float = K if str(K).isnumeric() else 9.1 * 10 ** 4
+        self.AuD: float = AuD if str(AuD).isnumeric() else 4.2 * 10 ** 0
+
+        self.isotropicpower: float = 0
 
         self.calculateisotropicpower()
 
-    def values(self, *args):
-        return [self.Hz,self.mG,self.B,self.K,self.AuD,self.isotropicpower]
+        self.send = send
 
-    def get_Hz(self, *args):
-        return self.Hz
+    @Slot()
+    def values(self):
+        self.send.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD])
 
-    def get_mG(self, *args):
-        return self.mG
+    @Slot()
+    def get_Hz(self):
+        self.send.receive_Hz.emit(self.Hz)
 
-    def get_B(self, *args):
-        return self.B
+    @Slot()
+    def get_mG(self):
+        self.send.receive_mG.emit(self.mG)
 
-    def get_K(self, *args):
-        return self.K
+    @Slot()
+    def get_B(self):
+        self.send.receive_B.emit(self.B)
 
-    def get_AuD(self, *args):
-        return self.AuD
+    @Slot()
+    def get_K(self):
+        self.send.receive_K.emit(self.K)
 
-    def set_Hz(self, *Hz):
-        if len(Hz) == 1:
-            if str(Hz[0]).isnumeric():
-                self.Hz = float(Hz[0])
-                self.calculateisotropicpower()
-                return True
-        return False
+    @Slot()
+    def get_AuD(self):
+        self.send.receive_AuD.emit(self.AuD)
 
-    def set_mG(self, *mG):
-        if len(mG) == 1:
-            if str(mG[0]).isnumeric():
-                self.mG = float(mG[0])
-                self.calculateisotropicpower()
-                return True
-        return False
+    @Slot(float)
+    def set_Hz(self, Hz):
+        self.Hz = float(Hz)
+        self.calculateisotropicpower()
+        self.send.receive_Hz.emit(self.Hz)
 
-    def set_B(self, *B):
-        if len(B) == 1:
-            if str(B[0]).isnumeric():
-                self.B = float(B[0])
-                self.calculateisotropicpower()
-                return True
-        return False
+    @Slot(float)
+    def set_mG(self, mG):
+        self.mG = float(mG)
+        self.calculateisotropicpower()
+        self.send.receive_mG.emit(self.mG)
 
-    def set_K(self, *K):
-        if len(K) == 1:
-            if str(K[0]).isnumeric():
-                self.K = float(K[0])
-                self.calculateisotropicpower()
-                return True
-        return False
+    @Slot(float)
+    def set_B(self, B):
+        self.B = float(B)
+        self.calculateisotropicpower()
+        self.send.receive_B.emit(self.B)
 
-    def set_AuD(self, *AuD):
-        if len(AuD) == 1:
-            if str(AuD[0]).isnumeric():
-                self.AuD = float(AuD[0])
-                self.calculateisotropicpower()
-                return True
-        return False
+
+    @Slot(float)
+    def set_K(self, K, *args):
+        self.K = float(K)
+        self.calculateisotropicpower()
+        self.send.receive_K.emit(self.K)
+
+    @Slot(float)
+    def set_AuD(self, AuD):
+        self.AuD = float(AuD)
+        self.calculateisotropicpower()
+        self.send.receive_AuD.emit(self.AuD)
 
     def calculateisotropicpower(self, *args):
-        λ : float = self.C/self.Hz #wavelength
-        G : float = 10**(self.mG/10) #antenna gain
-        Ae : float = G*λ**2/(4*self.pi) #effective area
+        λ: float = self.C/self.Hz  # wavelength
+        G: float = 10**(self.mG/10)  # antenna gain
+        Ae: float = G*λ**2/(4*self.pi)  # effective area
 
-        W : float = self.kB*self.K*self.B #power to antenna
-        F : float = W/(Ae*self.B) #flux density
-        J : float = F*10**26 #Jansky, unused but it was in the sheet
-        r : float = self.AuD*1.5*10**11 #distance to the sun (m)
-        rSph : float = 4*self.pi*r**2 #surface area of sphere with radius r
-        Wpms : float = 1/rSph #watts per square meter
+        W: float = self.kB*self.K*self.B  # power to antenna
+        F: float = W/(Ae*self.B)  # flux density
+        J: float = F*10**26  # Jansky, unused but it was in the sheet
+        r: float = self.AuD*1.5*10**11  # distance to the sun (m)
+        rSph: float = 4*self.pi*r**2  # surface area of sphere with radius r
+        Wpms: float = 1/rSph  # watts per square meter
 
-        iW : float = F/Wpms #isotropic joules
+        iW: float = F/Wpms  # isotropic joules
         self.isotropicpower : float = iW*2*10**6
         return self.isotropicpower
 
