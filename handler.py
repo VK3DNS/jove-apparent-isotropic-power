@@ -88,8 +88,8 @@ def run():
 def main():
     communicate = Communicate()
     rx = Receive()
-    send = Sender()
-    calc = Calculator(send)
+    tx = Sender()
+    calc = Calculator(tx)
 
     communicate.set_Hz.connect(calc.set_Hz)
     communicate.set_mG.connect(calc.set_mG)
@@ -103,12 +103,12 @@ def main():
     communicate.get_K.connect(calc.get_K)
     communicate.get_AuD.connect(calc.get_AuD)
 
-    send.receive_values.connect(rx.receive_values)
-    send.receive_Hz.connect(rx.receive_Hz)
-    send.receive_mG.connect(rx.receive_mG)
-    send.receive_B.connect(rx.receive_B)
-    send.receive_K.connect(rx.receive_K)
-    send.receive_AuD.connect(rx.receive_AuD)
+    tx.receive_values.connect(rx.receive_values)
+    tx.receive_Hz.connect(rx.receive_Hz)
+    tx.receive_mG.connect(rx.receive_mG)
+    tx.receive_B.connect(rx.receive_B)
+    tx.receive_K.connect(rx.receive_K)
+    tx.receive_AuD.connect(rx.receive_AuD)
 
     communicate.get_values.connect(calc.values)
     communicate.get_values.emit()
