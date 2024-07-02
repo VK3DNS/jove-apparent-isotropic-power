@@ -4,8 +4,9 @@ from PySide6.QtCore import Qt
 import get_lat_long_dist
 import datetime
 
-
 print(datetime.datetime.now())
+
+
 class MainWindow(QMainWindow):
     def __init__(self, communicate, values, rx, tx, calc):
         super().__init__()
