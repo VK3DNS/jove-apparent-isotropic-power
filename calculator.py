@@ -81,7 +81,7 @@ class Calculator(QObject):
         Key lines:
             self.tx.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD])
         """
-        self.tx.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD, self.isotropicpower])
+        self.tx.receive_values.emit([self.Hz, self.mG, self.B, self.K, self.AuD])
 
     @Slot()
     def get_Hz(self):
