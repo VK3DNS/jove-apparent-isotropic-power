@@ -10,5 +10,3 @@ app = QApplication(sys.argv)
 window = qapp.MainWindow(communicate, values, rx, tx, calc)
 window.show()
 app.exec()
-
-print('i think i fixed the thing')
