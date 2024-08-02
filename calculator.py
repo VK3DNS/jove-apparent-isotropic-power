@@ -230,6 +230,9 @@ class Calculator(QObject):
 
     @Slot(float)
     def set_AuD(self, AuD):
+        print("set_AuD")
+        AuD /= 10**7
+        print(AuD)
         """
         @Slot(float)
         set_AuD(self, AuD)
