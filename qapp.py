@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QSlider, QApplication, QLabel, QLineEdit, QPushButton, QTextEdit, QDateEdit, QTimeEdit, QCheckBox
-import sys as sys
-from PySide6.QtCore import Qt as Qt
+import sys
+from PySide6.QtCore import Qt
 import get_lat_long_dist
 import datetime
 
