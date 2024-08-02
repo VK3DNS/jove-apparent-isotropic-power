@@ -11,4 +11,4 @@ window = qapp.MainWindow(communicate, values, rx, tx, calc)
 window.show()
 app.exec()
 
-print('somethikjkljkljjk.hkljlkjklndg died')
+print('somet  jkljjk.hkllkdg died')
