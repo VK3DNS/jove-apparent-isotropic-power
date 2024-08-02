@@ -45,11 +45,13 @@ class MainWindow(QMainWindow):
         self.use_custom_time_label = QLabel("Use Custom Date & Time:")
         layout.addWidget(self.use_custom_time_label)
         self.use_custom_time = QCheckBox()
+        self.use_custom_time.stateChanged.connect(self.update)
         layout.addWidget(self.use_custom_time)
 
         self.use_daylight_savings_label = QLabel("Daylight Savings Time:")
         layout.addWidget(self.use_daylight_savings_label)
         self.use_daylight_savings = QCheckBox()
+        self.use_daylight_savings.stateChanged.connect(self.update)
         layout.addWidget(self.use_daylight_savings)
 
         self.antenna_temp_label = QLabel("Antenna Temp:")
@@ -68,7 +70,7 @@ class MainWindow(QMainWindow):
 
         self.update_button = QPushButton("Update")
         layout.addWidget(self.update_button)
-        self.update_button.clicked.connect(self.update_button_clicked)
+        self.update_button.clicked.connect(self.update)
 
         '''
         self.slider = QSlider(Qt.Horizontal)
@@ -86,14 +88,10 @@ class MainWindow(QMainWindow):
 
         self.update()
 
-    def update_button_clicked(self):
-        print("Update button clicked")
+    def update(self):
         self.jupiter.lat = self.get_latitude()
         self.jupiter.lon = self.get_longitude()
 
-        self.update()
-
-    def update(self):
         date = self.date_input.date().toPython()
         time = self.time_input.time().toPython()
         custom_datetime = datetime.datetime.combine(date, time)
