@@ -6,7 +6,8 @@ values = {
     'mG': False,
     'B': False,
     'K': False,
-    'AuD': False
+    'AuD': False,
+    "IsotropicPower": False
 }
 
 
@@ -159,7 +160,6 @@ def run():
         tx: instance of class Sender
         calc: instance of class Calculator
     """
-    from calculator import Calculator, Sender
 
 
     communicate = Communicate()
