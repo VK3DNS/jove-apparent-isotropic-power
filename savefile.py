@@ -9,7 +9,6 @@ defaults = {
     "time": str(datetime.datetime.now().time()),
     "timezone": 21,
     "auto_update": True,
-    "auto_update_before_override": False,
     "use_custom_time": False,
     "antenna_temp": 9.1 * 10 ** 4,
 }

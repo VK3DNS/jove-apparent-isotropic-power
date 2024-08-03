@@ -5,7 +5,7 @@ from astropy.coordinates import solar_system_ephemeris, EarthLocation, AltAz
 from astropy.coordinates import get_body_barycentric, get_body
 import datetime
 
-class JupiterValues():
+class ObjectData():
     def __init__(self):
         self.lat = "-36"
         self.lon = "144"

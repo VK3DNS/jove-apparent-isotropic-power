@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
 
         defaults = savefile.load()
 
-        self.jupiter = get_lat_long_dist.JupiterValues()
+        self.jupiter = get_lat_long_dist.ObjectData()
 
         self.communicate = communicate
         self.values = values
@@ -89,7 +89,6 @@ class MainWindow(QMainWindow):
         self.auto_update = QCheckBox()
         self.auto_update.setChecked(defaults["auto_update"])
         self.auto_update_was_checked = defaults["auto_update"]
-        self.auto_update_before_override = defaults["auto_update_before_override"]
         layout.addWidget(self.auto_update)
 
         self.update_button = QPushButton("Update")
@@ -119,12 +118,8 @@ class MainWindow(QMainWindow):
 
         custom_timezone = self.timezone_dropdown.currentIndex() - 11
 
-        if not self.use_custom_time.isChecked() and self.auto_update.isChecked():
-            self.date_input.setDate(datetime.date.today())
-            self.time_input.setTime(datetime.datetime.now().time())
-
-        date = self.date_input.date().toPython()
-        time = self.time_input.time().toPython()
+        date = self.date_input.date().toPython() if self.use_custom_time.isChecked() else datetime.date.today()
+        time = self.time_input.time().toPython() if self.use_custom_time.isChecked() else datetime.datetime.now().time()
         real_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         custom_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         self.jupiter.update_values(real_datetime if not self.use_custom_time.isChecked() else custom_datetime)
@@ -140,7 +135,7 @@ class MainWindow(QMainWindow):
 
         isopower = self.values["IsotropicPower"]
 
-        self.output_box.setPlainText(f"Distance: {self.jupiter.distance}\nRa: {self.jupiter.ra}\nDec: {self.jupiter.dec}\nAlt: {self.jupiter.alt}\nAz: {self.jupiter.az}\n\nTime zone: GMT{'+' if custom_timezone >=0 else ''}{custom_timezone}\n\nApparent Power: {isopower}")
+        self.output_box.setPlainText(f"Date: {date}\nTime: {time}\n\nDistance: {self.jupiter.distance}\nAlt: {self.jupiter.alt}\nAz: {self.jupiter.az}\n\nTime zone: GMT{'+' if custom_timezone >=0 else ''}{custom_timezone}\n\nApparent Power: {isopower}")
 
     def get_longitude(self):
         return self.lon_input.text()
@@ -151,12 +146,9 @@ class MainWindow(QMainWindow):
     def timerloop(self):
         if self.use_custom_time.isChecked() and (not self.use_custom_time_was_checked or self.firstloop):
             self.auto_update.setEnabled(False)
-            self.auto_update.setChecked(False)
             self.auto_update_before_override = self.auto_update_was_checked
         if not self.use_custom_time.isChecked() and (self.use_custom_time_was_checked or self.firstloop):
             self.auto_update.setEnabled(True)
-            if self.auto_update_before_override:
-                self.auto_update.setChecked(True)
         self.update()
         self.use_custom_time_was_checked = self.use_custom_time.isChecked()
         self.auto_update_was_checked = self.auto_update.isChecked()
@@ -172,7 +164,6 @@ class MainWindow(QMainWindow):
             "time": str(self.time_input.time().toPython()),
             "timezone": self.timezone_dropdown.currentIndex(),
             "auto_update": self.auto_update.isChecked(),
-            "auto_update_before_override": self.auto_update_before_override,
             "use_custom_time": self.use_custom_time.isChecked(),
             "antenna_temp": self.antenna_temp.text(),
         })
