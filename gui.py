@@ -9,6 +9,8 @@ communicate, values, rx, tx, calc = run()
 
 app = QApplication(sys.argv)
 window = qapp.MainWindow(communicate, values, rx, tx, calc)
+window.timerloop()
+window.saveloop()
 window.show()
 
 app.exec()
