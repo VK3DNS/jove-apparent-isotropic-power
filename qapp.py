@@ -1,6 +1,7 @@
-from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QSlider, QApplication, QLabel, QLineEdit, QPushButton, QTextEdit, QDateEdit, QTimeEdit, QCheckBox
+from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QSlider, QApplication, QComboBox, QLabel, QLineEdit, QPushButton, QTextEdit, QDateEdit, QTimeEdit, QCheckBox
 import sys
 from PySide6.QtCore import Qt
+import asyncio
 import get_lat_long_dist
 import datetime
 
@@ -38,21 +39,30 @@ class MainWindow(QMainWindow):
         self.custom_time_label = QLabel("Custom Date & Time:")
         layout.addWidget(self.custom_time_label)
         self.date_input = QDateEdit()
+        self.date_input.setDate(datetime.date.today())
         layout.addWidget(self.date_input)
         self.time_input = QTimeEdit()
+        self.time_input.setDisplayFormat("HH:mm:ss")
+        self.time_input.setTime(datetime.datetime.now().time())
         layout.addWidget(self.time_input)
+        self.timezone_dropdown_label = QLabel("Timezone:")
+        layout.addWidget(self.timezone_dropdown_label)
+        self.timezone_dropdown = QComboBox()
+        self.timezone_dropdown.addItems(f'GMT{"+" if i >= 0 else "-"}{-1*i if i < 0 else i}' for i in range(-11, 13))
+        self.timezone_dropdown.setCurrentIndex(21)
+        layout.addWidget(self.timezone_dropdown)
+
+        '''self.use_daylight_savings_label = QLabel("Daylight Savings Time:")
+        layout.addWidget(self.use_daylight_savings_label)
+        self.use_daylight_savings = QCheckBox()
+        self.use_daylight_savings.stateChanged.connect(self.update)
+        layout.addWidget(self.use_daylight_savings)'''
 
         self.use_custom_time_label = QLabel("Use Custom Date & Time:")
         layout.addWidget(self.use_custom_time_label)
         self.use_custom_time = QCheckBox()
         self.use_custom_time.stateChanged.connect(self.update)
         layout.addWidget(self.use_custom_time)
-
-        self.use_daylight_savings_label = QLabel("Daylight Savings Time:")
-        layout.addWidget(self.use_daylight_savings_label)
-        self.use_daylight_savings = QCheckBox()
-        self.use_daylight_savings.stateChanged.connect(self.update)
-        layout.addWidget(self.use_daylight_savings)
 
         self.antenna_temp_label = QLabel("Antenna Temp:")
         layout.addWidget(self.antenna_temp_label)
@@ -92,9 +102,15 @@ class MainWindow(QMainWindow):
         self.jupiter.lat = self.get_latitude()
         self.jupiter.lon = self.get_longitude()
 
+        custom_timezone = self.timezone_dropdown.currentIndex() - 11
+
+        if not self.use_custom_time.isChecked():
+            self.date_input.setDate(datetime.date.today())
+            self.time_input.setTime(datetime.datetime.now().time())
+
         date = self.date_input.date().toPython()
         time = self.time_input.time().toPython()
-        custom_datetime = datetime.datetime.combine(date, time)
+        custom_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         self.jupiter.update_values(datetime.datetime.now() if not self.use_custom_time.isChecked() else custom_datetime)
 
         num = float(str(self.jupiter.distance)[:-3])*10**7
@@ -108,10 +124,7 @@ class MainWindow(QMainWindow):
 
         isopower = self.values["IsotropicPower"]
 
-        AEDT = "AEDT"
-        AEST = "AEST"
-
-        self.output_box.setPlainText(f"Distance: {self.jupiter.distance}\nRa: {self.jupiter.ra}\nDec: {self.jupiter.dec}\n\nTime zone: {AEDT if self.use_daylight_savings.isChecked() else AEST}\n\nApparent Power: {isopower}")
+        self.output_box.setPlainText(f"Distance: {self.jupiter.distance}\nRa: {self.jupiter.ra}\nDec: {self.jupiter.dec}\n\nTime zone: GMT{'+' if custom_timezone >=0 else ''}{custom_timezone}\n\nApparent Power: {isopower}")
 
     def get_longitude(self):
         return self.lon_input.text()
