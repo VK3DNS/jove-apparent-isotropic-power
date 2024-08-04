@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         self.lon_input.setText(str(defaults["lon"]))
         layout.addWidget(self.lon_input)
 
-        self.alt_label = QLabel("Altitude:")
+        self.alt_label = QLabel("Altitude (m):")
         layout.addWidget(self.alt_label)
         self.alt_input = QLineEdit()
         self.alt_input.setText(str(defaults["elev"]))
@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
         self.use_custom_time.stateChanged.connect(self.update)
         layout.addWidget(self.use_custom_time)
 
-        self.antenna_temp_label = QLabel("Antenna Temp:")
+        self.antenna_temp_label = QLabel("Antenna Temp (K):")
         layout.addWidget(self.antenna_temp_label)
         self.antenna_temp = QLineEdit()
         self.antenna_temp.setText(str(defaults["antenna_temp"]))
@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
 
         self.update_button = QPushButton("Update")
         layout.addWidget(self.update_button)
-        self.update_button.clicked.connect(self.update)
+        self.update_button.clicked.connect(self.update_button_func)
 
         '''
         self.slider = QSlider(Qt.Horizontal)
@@ -113,6 +113,9 @@ class MainWindow(QMainWindow):
 
         self.update()
 
+    def update_button_func(self):
+        self.update(new_datetime=True)
+
     def update(self, new_datetime=False):
         self.jupiter.lat = self.get_latitude()
         self.jupiter.lon = self.get_longitude()
@@ -120,12 +123,16 @@ class MainWindow(QMainWindow):
 
         custom_timezone = self.timezone_dropdown.currentIndex() - 11
 
-        if new_datetime and not self.use_custom_time.isChecked():
-            self.date_input.setDate(new_datetime.date())
-            self.time_input.setTime(new_datetime.time())
-
         date = self.date_input.date().toPython() if self.use_custom_time.isChecked() else (datetime.date.today() if self.auto_update.isChecked() else self.date_before_auto_update)
         time = self.time_input.time().toPython() if self.use_custom_time.isChecked() else (datetime.datetime.now().time() if self.auto_update.isChecked() else self.time_before_auto_update)
+
+        if new_datetime and not self.use_custom_time.isChecked():
+            date = datetime.date.today()
+            time = datetime.datetime.now().time()
+            self.date_before_auto_update = date
+            self.time_before_auto_update = time
+
+
         real_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         custom_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         self.jupiter.update_values(real_datetime if not self.use_custom_time.isChecked() else custom_datetime)
@@ -152,13 +159,20 @@ class MainWindow(QMainWindow):
     def timerloop(self):
         if self.use_custom_time.isChecked() and (not self.use_custom_time_was_checked or self.firstloop):
             self.auto_update.setEnabled(False)
-            self.auto_update_before_override = self.auto_update_was_checked
         if not self.use_custom_time.isChecked() and (self.use_custom_time_was_checked or self.firstloop):
             self.auto_update.setEnabled(True)
 
-        if not self.auto_update.isChecked() and (self.auto_update_was_checked or self.firstloop):
+        if not self.auto_update.isChecked() and not self.use_custom_time.isChecked() and ((self.auto_update_was_checked or self.use_custom_time_was_checked) or self.firstloop):
+            self.update_button.setEnabled(True)
+
+        if not self.auto_update.isChecked() and not self.use_custom_time_was_checked and ((self.auto_update_was_checked or self.use_custom_time_was_checked) or self.firstloop):
             self.date_before_auto_update = datetime.date.today()
             self.time_before_auto_update = datetime.datetime.now().time()
+            self.update_button.setEnabled(True)
+
+
+        if (self.auto_update.isChecked() or self.use_custom_time.isChecked()) and (not self.auto_update_was_checked or self.firstloop):
+            self.update_button.setEnabled(False)
 
         self.update()
         self.use_custom_time_was_checked = self.use_custom_time.isChecked()
