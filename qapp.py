@@ -89,6 +89,8 @@ class MainWindow(QMainWindow):
         self.auto_update = QCheckBox()
         self.auto_update.setChecked(defaults["auto_update"])
         self.auto_update_was_checked = defaults["auto_update"]
+        self.date_before_auto_update = self.date_input.date().toPython()
+        self.time_before_auto_update = self.time_input.time().toPython()
         layout.addWidget(self.auto_update)
 
         self.update_button = QPushButton("Update")
@@ -118,8 +120,12 @@ class MainWindow(QMainWindow):
 
         custom_timezone = self.timezone_dropdown.currentIndex() - 11
 
-        date = self.date_input.date().toPython() if self.use_custom_time.isChecked() else datetime.date.today()
-        time = self.time_input.time().toPython() if self.use_custom_time.isChecked() else datetime.datetime.now().time()
+        if new_datetime and not self.use_custom_time.isChecked():
+            self.date_input.setDate(new_datetime.date())
+            self.time_input.setTime(new_datetime.time())
+
+        date = self.date_input.date().toPython() if self.use_custom_time.isChecked() else (datetime.date.today() if self.auto_update.isChecked() else self.date_before_auto_update)
+        time = self.time_input.time().toPython() if self.use_custom_time.isChecked() else (datetime.datetime.now().time() if self.auto_update.isChecked() else self.time_before_auto_update)
         real_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         custom_datetime = datetime.datetime.combine(date, time, datetime.timezone(datetime.timedelta(hours=custom_timezone)))
         self.jupiter.update_values(real_datetime if not self.use_custom_time.isChecked() else custom_datetime)
@@ -149,6 +155,11 @@ class MainWindow(QMainWindow):
             self.auto_update_before_override = self.auto_update_was_checked
         if not self.use_custom_time.isChecked() and (self.use_custom_time_was_checked or self.firstloop):
             self.auto_update.setEnabled(True)
+
+        if not self.auto_update.isChecked() and (self.auto_update_was_checked or self.firstloop):
+            self.date_before_auto_update = datetime.date.today()
+            self.time_before_auto_update = datetime.datetime.now().time()
+
         self.update()
         self.use_custom_time_was_checked = self.use_custom_time.isChecked()
         self.auto_update_was_checked = self.auto_update.isChecked()
