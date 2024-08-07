@@ -148,7 +148,8 @@ class MainWindow(QMainWindow):
 
         isopower = self.values["IsotropicPower"]
 
-        self.output_box.setPlainText(f"Date: {date}\nTime: {time}\nTime zone: GMT{'+' if custom_timezone >=0 else ''}{custom_timezone}\n\nDistance: {self.jupiter.distance}\nAlt: {self.jupiter.alt}\nAz: {self.jupiter.az}\n\nApparent Power: {isopower}\n\nData valid: {int(self.jupiter.sunalt.split('d')[0]) <= -18 and int(self.jupiter.alt.split('d')[0]) >= 20}")
+        self.data_valid = int(self.jupiter.sunalt.split('d')[0]) <= -18 and int(self.jupiter.alt.split('d')[0]) >= 20
+        self.output_box.setPlainText(f"Date: {date}\nTime: {time}\nTime zone: GMT{'+' if custom_timezone >=0 else ''}{custom_timezone}\n\nDistance: {self.jupiter.distance}\nAlt: {self.jupiter.alt}\nAz: {self.jupiter.az}\n\nApparent Power: {isopower}\n\nData valid: {self.data_valid}")
 
     def get_longitude(self):
         return self.lon_input.text()
